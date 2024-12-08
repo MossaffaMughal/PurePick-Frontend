@@ -1,6 +1,6 @@
 // src/screens/HomeScreen.js
 import React from "react";
-import { View, StyleSheet, Image, Text } from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 
 const HomeScreen = ({ navigation }) => {
@@ -31,20 +31,26 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Footer Section */}
       <View style={styles.footer}>
-        <View style={styles.iconContainer}>
+        <TouchableOpacity
+          style={styles.iconContainer}
+          onPress={() => navigation.navigate("Home")}
+        >
           <Image
             source={require("../assets/images/home_icon.png")}
             style={styles.icon}
           />
           <Text style={styles.iconText}>Home</Text>
-        </View>
-        <View style={styles.iconContainer}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconContainer}
+          onPress={() => navigation.navigate("About")}
+        >
           <Image
             source={require("../assets/images/about_icon.png")}
             style={styles.icon}
           />
           <Text style={styles.iconText}>About</Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Background Image - boycott */}

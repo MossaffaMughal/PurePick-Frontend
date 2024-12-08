@@ -1,13 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const AllergenCheckScreen = ({ navigation }) => {
+const About = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Allergen Check</Text>
-      <Text style={styles.detail}>
-        This screen will allow users to check for allergens in products.
-      </Text>
+      <Text style={styles.title}>About Us</Text>
+      <Text style={styles.detail}></Text>
     </View>
   );
 };
@@ -33,4 +31,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AllergenCheckScreen;
+export default About;

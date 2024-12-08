@@ -27,18 +27,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-    backgroundColor: "white",
-    borderRadius: 20,
-    marginBottom: 15,
-    alignItems: "center",
-    width: 200,
-    borderWidth: 4,
-    borderColor: "#0d640d",
-  },
-  buttonText: {
     color: "#0d640d",
     fontWeight: "bold",
     fontSize: 20,
