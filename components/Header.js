@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
-const Header = ({ navigation }) => {
+const Header = ({ navigation, title }) => {
   return (
     <View style={styles.container}>
       {/* Left Side - Back Arrow */}
@@ -17,7 +17,7 @@ const Header = ({ navigation }) => {
 
       {/* Title Text */}
       <View style={styles.center}>
-        <Text style={styles.title}>Boycott Check</Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
     </View>
   );

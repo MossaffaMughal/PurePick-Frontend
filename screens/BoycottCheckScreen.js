@@ -12,7 +12,7 @@ const BoycottCheckScreen = ({ navigation }) => {
       />
 
       {/* Header Section */}
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title="Boycott Check Screen" />
 
       <View style={styles.barcodeContainer}>
         <View style={styles.lineContainer} />
