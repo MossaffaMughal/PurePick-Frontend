@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   barcodeContainer: {
     width: 300, // Adjust the width as needed
-    height: 200, // Adjust the height as needed
+    height: 210, // Adjust the height as needed
     alignItems: "center", // Center the image horizontally
     justifyContent: "center", // Center the content vertically inside the rectangle
     backgroundColor: "#f0f0f0", // Light gray background for the container
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   barcodeImg: {
     width: 260, // Adjust the width as needed
-    height: 160, // Adjust the height as needed
+    height: 170, // Adjust the height as needed
     borderRadius: 10,
   },
   lineContainer: {

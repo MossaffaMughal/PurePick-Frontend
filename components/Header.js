@@ -7,7 +7,15 @@ const Header = ({ navigation, title }) => {
     <View style={styles.container}>
       {/* Left Side - Back Arrow */}
       <View style={styles.left}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack(); // Go back if possible
+            } else {
+              navigation.navigate("HomeScreen"); // Fallback to HomeScreen
+            }
+          }}
+        >
           <Image
             source={require("../assets/images/back_arrow.png")}
             style={styles.icon}
