@@ -8,6 +8,7 @@ import AboutUsScreen from "../screens/AboutUsScreen";
 import OurMissionScreen from "../screens/OurMissionScreen";
 import WhatWeOfferScreen from "../screens/WhatWeOfferScreen";
 import WhyPurePickScreen from "../screens/WhyPurePickScreen";
+import SafeProductScreen from "../screens/SafeProductScreen";
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Mission" component={OurMissionScreen} />
         <Stack.Screen name="Offer" component={WhatWeOfferScreen} />
         <Stack.Screen name="WhyPurePick" component={WhyPurePickScreen} />
+        <Stack.Screen name="SafeProduct" component={SafeProductScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

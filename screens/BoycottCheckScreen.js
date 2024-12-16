@@ -99,6 +99,14 @@ const BoycottCheckScreen = ({ navigation }) => {
           </View>
         )}
 
+        <TouchableOpacity onPress={() => navigation.navigate("SafeProduct")}>
+          <Text>Safe Product</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate("SafeProduct")}>
+          <Text>Boycott Product</Text>
+        </TouchableOpacity>
+
         {/* Buttons */}
         <TouchableOpacity
           style={styles.button}
@@ -138,6 +146,12 @@ const BoycottCheckScreen = ({ navigation }) => {
             <Text style={styles.rightText}>Boycott</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SafeProductScreen")}
+        >
+          <Text style={styles.leftText}>Safe Product</Text>
+        </TouchableOpacity>
 
         {/* Footer Section */}
         <View style={styles.footer}>
