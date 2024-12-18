@@ -1,5 +1,5 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, StackActions } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import AllergenCheckScreen from "../screens/AllergenCheckScreen";
@@ -9,6 +9,7 @@ import OurMissionScreen from "../screens/OurMissionScreen";
 import WhatWeOfferScreen from "../screens/WhatWeOfferScreen";
 import WhyPurePickScreen from "../screens/WhyPurePickScreen";
 import SafeProductScreen from "../screens/SafeProductScreen";
+import BoycottProductScreen from "../screens/BoycottProductScreen";
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Offer" component={WhatWeOfferScreen} />
         <Stack.Screen name="WhyPurePick" component={WhyPurePickScreen} />
         <Stack.Screen name="SafeProduct" component={SafeProductScreen} />
+        <Stack.Screen name="BoycottProduct" component={BoycottProductScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

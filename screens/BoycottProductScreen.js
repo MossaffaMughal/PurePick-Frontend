@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
-const SafeProductScreen = ({ navigation }) => {
+const BoycottProductScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header with Back and Home Buttons */}
@@ -32,24 +32,32 @@ const SafeProductScreen = ({ navigation }) => {
       {/* Checkmark and Text */}
       <View style={styles.content}>
         <Image
-          source={require("../assets/images/ai.png")} // Replace with actual path
+          source={require("../assets/images/man_cross.png")} // Replace with actual path
           style={styles.image}
         />
         <Image
-          source={require("../assets/images/checkmark.png")} // Replace with actual path
-          style={styles.checkmarkImage}
+          source={require("../assets/images/cross.png")} // Replace with actual path
+          style={styles.crossImage}
         />
         <Text style={styles.productText}>
-          This product is good {"\n"} for now!
+          This product is on the {"\n"} boycott list!
         </Text>
       </View>
 
       {/* Scan Another Product Button */}
       <TouchableOpacity
-        style={styles.button}
+        style={styles.button_scan}
         onPress={() => navigation.navigate("BoycottCheck")}
       >
         <Text style={styles.buttonText}>Scan Another Product</Text>
+      </TouchableOpacity>
+
+      {/* Search Alternatives Product Button */}
+      <TouchableOpacity
+        style={styles.button_alternatives}
+        onPress={() => navigation.navigate("BoycottCheck")}
+      >
+        <Text style={styles.buttonText}>Search Alternatives</Text>
       </TouchableOpacity>
 
       {/* Bottom Text */}
@@ -74,7 +82,7 @@ const SafeProductScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#9BC986",
+    backgroundColor: "#fa8787",
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 30,
@@ -95,17 +103,16 @@ const styles = StyleSheet.create({
     tintColor: "white", // Optional to match the text color
   },
   image: {
-    width: 110,
-    height: 110,
-    right: 18,
-    top: 5,
-    marginTop: 80, // Adjusted to avoid overlap with the header
+    width: 130,
+    height: 130,
+    right: 1,
+    marginTop: 20, // Adjusted to avoid overlap with the header
     zIndex: 2,
   },
-  checkmarkImage: {
-    width: 190,
-    height: 190,
-    marginBottom: 20,
+  crossImage: {
+    width: 180,
+    height: 180,
+    marginBottom: 10,
     marginTop: -15,
   },
   content: {
@@ -117,13 +124,33 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
   },
-  button: {
+  button_alternatives: {
     justifyContent: "center",
-    backgroundColor: "#086308",
+    backgroundColor: "#cf3e3e",
     borderColor: "white",
     borderWidth: 4,
     borderRadius: 20,
     marginBottom: 30,
+    marginTop: 10,
+    alignItems: "center",
+    width: 300,
+    height: 80,
+    // Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    // Elevation for Android
+    elevation: 5,
+    zIndex: 1,
+  },
+  button_scan: {
+    justifyContent: "center",
+    backgroundColor: "#cf3e3e",
+    borderColor: "white",
+    borderWidth: 4,
+    borderRadius: 20,
+    marginBottom: 3,
     marginTop: 30,
     alignItems: "center",
     width: 300,
@@ -174,4 +201,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SafeProductScreen;
+export default BoycottProductScreen;
