@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   image: {
     width: 110,
     height: 110,
-    right: 18,
+    right: 17,
     top: 5,
     marginTop: 80, // Adjusted to avoid overlap with the header
     zIndex: 2,
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 30,
     alignItems: "center",
-    width: 300,
-    height: 80,
+    width: 280,
+    height: 65,
     // Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },

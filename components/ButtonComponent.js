@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 15,
     alignItems: "center",
-    width: 200,
+    width: 220,
     // Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },

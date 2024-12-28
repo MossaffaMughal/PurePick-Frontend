@@ -55,7 +55,7 @@ const BoycottProductScreen = ({ navigation }) => {
       {/* Search Alternatives Product Button */}
       <TouchableOpacity
         style={styles.button_alternatives}
-        onPress={() => navigation.navigate("BoycottCheck")}
+        onPress={() => navigation.navigate("Alternatives")}
       >
         <Text style={styles.buttonText}>Search Alternatives</Text>
       </TouchableOpacity>
@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 10,
     alignItems: "center",
-    width: 300,
-    height: 80,
+    width: 280,
+    height: 65,
     // Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
     marginBottom: 3,
     marginTop: 30,
     alignItems: "center",
-    width: 300,
-    height: 80,
+    width: 280,
+    height: 65,
     // Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
