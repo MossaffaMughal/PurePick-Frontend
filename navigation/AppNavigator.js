@@ -12,6 +12,7 @@ import SafeProductScreen from "../screens/SafeProductScreen";
 import BoycottProductScreen from "../screens/BoycottProductScreen";
 import AlternativesScreen from "../screens/AlternativesScreen";
 import NoAlternative from "../screens/NoAlternative";
+import NoInfoScreen from "../screens/NoInfoScreen";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,7 @@ const AppNavigator = () => {
         <Stack.Screen name="BoycottProduct" component={BoycottProductScreen} />
         <Stack.Screen name="Alternatives" component={AlternativesScreen} />
         <Stack.Screen name="NoAlternative" component={NoAlternative} />
+        <Stack.Screen name="NoInfo" component={NoInfoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

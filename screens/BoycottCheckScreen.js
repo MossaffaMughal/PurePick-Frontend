@@ -29,7 +29,7 @@ const BoycottCheckScreen = ({ navigation }) => {
   }, [permission]);
 
   if (!permission) {
-    return <View />;
+    return <View />; // Early return to prevent rendering while checking permission
   }
 
   if (!permission.granted) {
@@ -61,10 +61,15 @@ const BoycottCheckScreen = ({ navigation }) => {
       };
 
       const response = await axios.request(options);
-      setExtractedData(response.data);
+
+      if (!response.data || Object.keys(response.data).length === 0) {
+        navigation.navigate("NoInfo");
+      } else {
+        setExtractedData(response.data);
+      }
     } catch (error) {
-      alert("Failed to fetch data from the barcode");
       console.error("Error fetching barcode data:", error);
+      navigation.navigate("NoInfo");
     } finally {
       setLoading(false);
     }
@@ -82,16 +87,19 @@ const BoycottCheckScreen = ({ navigation }) => {
         {/* Header Section */}
         <Header navigation={navigation} title="Boycott Check Screen" />
 
+        {/* Camera View for Barcode Scanning */}
         <View style={styles.barcodeContainer}>
           <CameraView
             style={styles.camera}
             facing={facing}
             onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          ></CameraView>
+          />
         </View>
 
+        {/* Loading Indicator */}
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
+        {/* Display Extracted Data */}
         {extractedData && (
           <View style={styles.productInfo}>
             <Text style={styles.title}>Extracted Data:</Text>
@@ -99,6 +107,7 @@ const BoycottCheckScreen = ({ navigation }) => {
           </View>
         )}
 
+        {/* Navigation Buttons */}
         <TouchableOpacity onPress={() => navigation.navigate("SafeProduct")}>
           <Text>Safe Product</Text>
         </TouchableOpacity>
@@ -107,12 +116,16 @@ const BoycottCheckScreen = ({ navigation }) => {
           <Text>Boycott Product</Text>
         </TouchableOpacity>
 
-        {/* Buttons */}
+        <TouchableOpacity onPress={() => navigation.navigate("NoInfo")}>
+          <Text>No Information About Product</Text>
+        </TouchableOpacity>
+
+        {/* Button to Rescan */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            setScanned(false); // Reset scanned state to allow scanning again
-            setExtractedData(null); // Clear extracted data
+            setScanned(false);
+            setExtractedData(null);
           }}
         >
           <Text style={styles.buttonText}>
@@ -178,8 +191,6 @@ const BoycottCheckScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
   },
   container: {
     flex: 1,
@@ -228,7 +239,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderRadius: 20,
     marginBottom: 50,
-    marginTop: 50,
+    marginTop: 20,
     alignItems: "center",
     width: 300,
     height: 60,
