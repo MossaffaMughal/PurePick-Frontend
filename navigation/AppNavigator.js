@@ -13,6 +13,9 @@ import BoycottProductScreen from "../screens/BoycottProductScreen";
 import AlternativesScreen from "../screens/AlternativesScreen";
 import NoAlternative from "../screens/NoAlternative";
 import NoInfoScreen from "../screens/NoInfoScreen";
+import FeedbackInputScreen from "../screens/FeedbackInputScreen";
+import FeedbackFailedScreen from "../screens/FeedbackFailedScreen";
+import FeedbackSubmittedScreen from "../screens/FeedbackSubmittedScreen";
 
 const Stack = createStackNavigator();
 
@@ -39,6 +42,12 @@ const AppNavigator = () => {
         <Stack.Screen name="Alternatives" component={AlternativesScreen} />
         <Stack.Screen name="NoAlternative" component={NoAlternative} />
         <Stack.Screen name="NoInfo" component={NoInfoScreen} />
+        <Stack.Screen name="Feedback" component={FeedbackInputScreen} />
+        <Stack.Screen name="FeedbackFailed" component={FeedbackFailedScreen} />
+        <Stack.Screen
+          name="FeedbackSubmitted"
+          component={FeedbackSubmittedScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

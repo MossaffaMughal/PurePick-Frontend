@@ -43,6 +43,16 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}
+          onPress={() => navigation.navigate("Feedback")}
+        >
+          <Image
+            source={require("../assets/images/feedback_icon.png")} // Add a feedback icon image in the assets
+            style={styles.feedbackicon}
+          />
+          <Text style={styles.iconText}>Feedback</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconContainer}
           onPress={() => navigation.navigate("About")}
         >
           <Image
@@ -117,6 +127,12 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginBottom: 10,
+  },
+  feedbackicon: {
+    width: 35,
+    height: 35,
+    marginBottom: 6,
+    tintColor: "#0d640d",
   },
   iconContainer: {
     justifyContent: "center",
