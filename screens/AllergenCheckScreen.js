@@ -1,59 +1,81 @@
 import React from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import Header from "../components/Header";
 
 const AllergenCheckScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      {/* Background Image - boycott */}
+      {/* Background Image */}
       <Image
         source={require("../assets/images/background-allergen.png")}
-        style={styles.backgroundImageboycott}
+        style={styles.backgroundImage}
       />
 
       {/* Header Section */}
       <Header navigation={navigation} title="Allergen Check Screen" />
 
-      <View style={styles.barcodeContainer}>
-        <View style={styles.lineContainer} />
-
-        <Image
-          source={require("../assets/images/ingredients.png")}
-          style={styles.allergenImg}
-        />
-      </View>
-
-      {/* Buttons */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Upload Ingredients Image</Text>
-      </TouchableOpacity>
-
-      {/* Square Containers */}
-      <View style={styles.squareContainers}>
-        {/* Left Square Container */}
-        <TouchableOpacity
-          style={[styles.squareContainer, styles.leftContainer]}
-          onPress={() => navigation.navigate("AllergenCheck")}
-        >
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* Barcode Section */}
+        <View style={styles.barcodeContainer}>
+          <View style={styles.lineContainer} />
           <Image
-            source={require("../assets/images/health_icon.png")}
-            style={styles.optionIcon}
+            source={require("../assets/images/ingredients.png")}
+            style={styles.allergenImg}
           />
-          <Text style={styles.leftText}>Allergen</Text>
+        </View>
+
+        {/* Buttons */}
+        <TouchableOpacity
+          style={styles.buttonSec}
+          onPress={() => navigation.navigate("AllergenDisplay")}
+        >
+          <Text style={styles.buttonText}>Allergen Display</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttonSec}
+          onPress={() => navigation.navigate("NoAllergenFound")}
+        >
+          <Text style={styles.buttonText}>No Allergen Found</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Upload Ingredients Image</Text>
         </TouchableOpacity>
 
-        {/* Right Square Container */}
-        <TouchableOpacity
-          style={[styles.squareContainer, styles.rightContainer]}
-          onPress={() => navigation.navigate("BoycottCheck")}
-        >
-          <Image
-            source={require("../assets/images/boycott_icon.png")}
-            style={styles.optionIcon}
-          />
-          <Text style={styles.rightText}>Boycott</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Square Containers */}
+        <View style={styles.squareContainers}>
+          {/* Left Square Container */}
+          <TouchableOpacity
+            style={[styles.squareContainer, styles.leftContainer]}
+            onPress={() => navigation.navigate("AllergenCheck")}
+          >
+            <Image
+              source={require("../assets/images/health_icon.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.leftText}>Allergen</Text>
+          </TouchableOpacity>
+
+          {/* Right Square Container */}
+          <TouchableOpacity
+            style={[styles.squareContainer, styles.rightContainer]}
+            onPress={() => navigation.navigate("BoycottCheck")}
+          >
+            <Image
+              source={require("../assets/images/boycott_icon.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.rightText}>Boycott</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       {/* Footer Section */}
       <View style={styles.footer}>
@@ -85,33 +107,37 @@ const AllergenCheckScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "transparent", // Ensuring the background image shows through
+    backgroundColor: "transparent",
   },
-  backgroundImageboycott: {
+  backgroundImage: {
     position: "absolute",
-    top: 20,
+    top: 0,
     left: 0,
-    width: 450,
-    height: 750,
+    width: "100%",
+    height: "100%",
     opacity: 0.9,
-    zIndex: -1, // Set this to a low index to keep background behind content
+    zIndex: -1,
+  },
+  scrollViewContent: {
+    paddingHorizontal: 20,
+    paddingTop: 150, // Add padding to avoid overlap with header
+    paddingBottom: 120, // Ensure content doesn't overlap with footer
+    alignItems: "center",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    height: 100,
-    backgroundColor: "#086308", // Customize footer color as needed
+    height: 80,
+    backgroundColor: "#086308",
     width: "100%",
-    position: "absolute", // Fix the footer to the bottom
-    bottom: 0, // Set the footer to the bottom of the screen
+    position: "absolute",
+    bottom: 0,
   },
   icon: {
     width: 25,
     height: 25,
-    marginBottom: 10,
+    marginBottom: 5,
     tintColor: "white",
   },
   iconContainer: {
@@ -120,102 +146,101 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: "white",
-    textAlign: "center",
     fontWeight: "bold",
+    fontSize: 14,
   },
   button: {
-    padding: 10,
+    padding: 15,
     backgroundColor: "#086308",
     borderColor: "white",
     borderWidth: 4,
     borderRadius: 20,
-    marginBottom: 50,
-    marginTop: 50,
+    marginVertical: 20,
     alignItems: "center",
     width: 300,
-    height: 60,
-    // Shadow for iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    // Elevation for Android
+    height: 65,
     elevation: 5,
-    zIndex: 1,
+  },
+  buttonSec: {
+    padding: 15,
+    backgroundColor: "#086308",
+    borderColor: "white",
+    borderWidth: 4,
+    borderRadius: 20,
+    marginVertical: 10,
+    alignItems: "center",
+    width: 300,
+    height: 65,
+    elevation: 5,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 20,
-    textAlign: "center",
+    fontSize: 18,
   },
   barcodeContainer: {
-    width: 300, // Adjust the width as needed
-    height: 210, // Adjust the height as needed
-    alignItems: "center", // Center the image horizontally
-    justifyContent: "center", // Center the content vertically inside the rectangle
-    backgroundColor: "#f0f0f0", // Light gray background for the container
+    width: 300,
+    height: 210,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f0f0f0",
     borderColor: "#086308",
     borderWidth: 4,
-    borderRadius: 20, // Optional: rounded corners for the rectangle
-    marginHorizontal: 20, // Optional: some margin on the left and right
-    padding: 10, // Optional: padding around the image inside the container
-    marginTop: 180,
+    borderRadius: 20,
+    marginTop: 20,
   },
   allergenImg: {
-    width: 260, // Adjust the width as needed
-    height: 170, // Adjust the height as needed
+    width: 260,
+    height: 170,
     borderRadius: 10,
   },
   lineContainer: {
     position: "absolute",
-    top: "50%", // Center the line vertically over the barcode image
+    top: "50%",
     left: 0,
-    width: 295,
-    height: 2, // Line thickness
+    width: "100%",
+    height: 3,
     backgroundColor: "#086308",
-    borderWidth: 2,
-    borderColor: "#086308",
     zIndex: 1,
   },
   squareContainers: {
     flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-    alignContent: "center",
+    justifyContent: "space-between",
+    marginVertical: 20,
   },
   squareContainer: {
-    width: 145,
-    height: 145,
+    width: 140,
+    height: 140,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,
     borderWidth: 4,
   },
   rightContainer: {
-    marginRight: 10,
     backgroundColor: "#086308",
     borderColor: "white",
+    marginLeft: 10,
   },
   rightText: {
     color: "white",
     fontWeight: "bold",
     marginTop: 10,
-    fontSize: 20,
+    fontSize: 16,
   },
   leftContainer: {
     backgroundColor: "white",
     borderColor: "#086308",
+    marginRight: 10,
   },
   leftText: {
     color: "#086308",
     fontWeight: "bold",
     marginTop: 10,
-    fontSize: 20,
+    fontSize: 16,
   },
   optionIcon: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
   },
 });
 

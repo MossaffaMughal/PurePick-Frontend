@@ -16,6 +16,8 @@ import NoInfoScreen from "../screens/NoInfoScreen";
 import FeedbackInputScreen from "../screens/FeedbackInputScreen";
 import FeedbackFailedScreen from "../screens/FeedbackFailedScreen";
 import FeedbackSubmittedScreen from "../screens/FeedbackSubmittedScreen";
+import AllergensDisplayScreen from "../screens/AllergyDisplayScreen";
+import NoAllergenFoundScreen from "../screens/NoAllergenFoundScreen";
 
 const Stack = createStackNavigator();
 
@@ -45,8 +47,16 @@ const AppNavigator = () => {
         <Stack.Screen name="Feedback" component={FeedbackInputScreen} />
         <Stack.Screen name="FeedbackFailed" component={FeedbackFailedScreen} />
         <Stack.Screen
+          name="AllergenDisplay"
+          component={AllergensDisplayScreen}
+        />
+        <Stack.Screen
           name="FeedbackSubmitted"
           component={FeedbackSubmittedScreen}
+        />
+        <Stack.Screen
+          name="NoAllergenFound"
+          component={NoAllergenFoundScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

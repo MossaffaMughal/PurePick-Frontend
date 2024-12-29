@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 3 }, // Shadow offset (horizontal and vertical)
     textShadowRadius: 4, // Shadow blur radius
   },
-
   messageSec: {
     fontSize: 18,
     color: "#086308",
