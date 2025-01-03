@@ -56,7 +56,7 @@ const BoycottCheckScreen = ({ navigation }) => {
         method: "GET",
         url: `API_ADDRESS/code/${data}`,
         headers: {
-          "x-rapidapi-key": "API_KEY",
+          "x-rapidapi-key": "MY_API_KEY",
           "x-rapidapi-host": "API_HOST",
         },
       };
