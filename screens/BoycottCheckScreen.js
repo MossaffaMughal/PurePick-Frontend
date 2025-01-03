@@ -49,27 +49,89 @@ const BoycottCheckScreen = ({ navigation }) => {
     setLoading(true);
 
     try {
-      // Fetch extracted data from the new API using Axios
-      const options = {
+      console.log("Making request to external API...");
+
+      // Fetch extracted data from the external API using Axios
+      const externalApiOptions = {
         method: "GET",
-        url: `https://product-lookup-by-upc-or-ean.p.rapidapi.com/code/${data}`,
+        url: `API_ADDRESS/code/${data}`,
         headers: {
-          "x-rapidapi-key":
-            "f887c2d552msh6f354d4fb3c716ep1b5ddbjsnb9c6e58713ea",
-          "x-rapidapi-host": "product-lookup-by-upc-or-ean.p.rapidapi.com",
+          "x-rapidapi-key": "API_KEY",
+          "x-rapidapi-host": "API_HOST",
         },
       };
 
-      const response = await axios.request(options);
+      const externalApiResponse = await axios.request(externalApiOptions);
 
-      if (!response.data || Object.keys(response.data).length === 0) {
-        navigation.navigate("NoInfo");
+      // Check if data exists in the external API response
+      if (
+        !externalApiResponse.data ||
+        !externalApiResponse.data.product ||
+        Object.keys(externalApiResponse.data.product).length === 0
+      ) {
+        console.warn("No product data found in the external API response.");
+        navigation.navigate("NoInfo", {
+          message:
+            "No information found for the scanned product. Please try another item.",
+        });
+        return;
+      }
+
+      // Extract brand name or relevant identifier from the response
+      const brandName = externalApiResponse.data.product?.brand || "Unknown";
+      console.log("Extracted brand name:", brandName);
+
+      // Fetch boycott status from the backend
+      console.log("Sending request to backend for boycott status...");
+      const backendApiResponse = await axios.post(
+        "BACKEND_URL",
+        { brand: brandName },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      const { status, message, country_of_manufacture } =
+        backendApiResponse.data;
+
+      if (status === "boycotted") {
+        console.log("Product is boycotted.");
+        navigation.navigate("BoycottProduct", {
+          brand: brandName,
+          reason: message,
+          countryOfManufacture: country_of_manufacture,
+        });
+      } else if (status === "not_boycotted") {
+        console.log("Product is safe.");
+        navigation.navigate("SafeProduct", { brand: brandName, message });
       } else {
-        setExtractedData(response.data);
+        console.warn("Unexpected status:", status);
+        navigation.navigate("NoInfo");
       }
     } catch (error) {
-      console.error("Error fetching barcode data:", error);
-      navigation.navigate("NoInfo");
+      console.log("Error occurred during barcode scan:", error);
+
+      let userFriendlyMessage =
+        "An unexpected error occurred. Please try again later.";
+
+      if (error.response) {
+        console.log("Backend responded with error:", error.response.data);
+        console.log("Status code:", error.response.status);
+
+        if (error.response.status === 404) {
+          userFriendlyMessage =
+            "No information found for the scanned product. Please try another item.";
+        } else if (error.response.status === 409) {
+          userFriendlyMessage =
+            "There was a conflict with the request. Please try again.";
+        }
+      } else if (error.request) {
+        console.log("No response received from the backend:", error.request);
+        userFriendlyMessage =
+          "Could not connect to the server. Check your internet connection.";
+      } else {
+        console.log("Error during setup of the request:", error.message);
+      }
+
+      navigation.navigate("NoInfo", { message: userFriendlyMessage });
     } finally {
       setLoading(false);
     }
@@ -106,19 +168,6 @@ const BoycottCheckScreen = ({ navigation }) => {
             <Text>{JSON.stringify(extractedData, null, 2)}</Text>
           </View>
         )}
-
-        {/* Navigation Buttons */}
-        <TouchableOpacity onPress={() => navigation.navigate("SafeProduct")}>
-          <Text>Safe Product</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate("BoycottProduct")}>
-          <Text>Boycott Product</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate("NoInfo")}>
-          <Text>No Information About Product</Text>
-        </TouchableOpacity>
 
         {/* Button to Rescan */}
         <TouchableOpacity
@@ -239,7 +288,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderRadius: 20,
     marginBottom: 50,
-    marginTop: 20,
+    marginTop: 40,
     alignItems: "center",
     width: 300,
     height: 60,
