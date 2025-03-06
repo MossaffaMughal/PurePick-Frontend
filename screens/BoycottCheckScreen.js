@@ -47,23 +47,24 @@ const BoycottCheckScreen = ({ navigation }) => {
     setScanned(true);
     setBarcodeData(data);
     setLoading(true);
+    console.log("Barcode scanned:", data); // Debugging barcode data
 
     try {
-      console.log("Making request to external API...");
+      console.log("Making request to external API with barcode:", data);
 
-      // Fetch extracted data from the external API using Axios
       const externalApiOptions = {
         method: "GET",
-        url: `API_ADDRESS/code/${data}`,
+        url: `https://product-lookup-by-upc-or-ean.p.rapidapi.com/code/${data}`,
         headers: {
-          "x-rapidapi-key": "MY_API_KEY",
-          "x-rapidapi-host": "API_HOST",
+          "x-rapidapi-key":
+            "f887c2d552msh6f354d4fb3c716ep1b5ddbjsnb9c6e58713ea",
+          "x-rapidapi-host": "product-lookup-by-upc-or-ean.p.rapidapi.com",
         },
       };
 
       const externalApiResponse = await axios.request(externalApiOptions);
+      console.log("External API response:", externalApiResponse.data); // Debugging response
 
-      // Check if data exists in the external API response
       if (
         !externalApiResponse.data ||
         !externalApiResponse.data.product ||
@@ -77,17 +78,17 @@ const BoycottCheckScreen = ({ navigation }) => {
         return;
       }
 
-      // Extract brand name or relevant identifier from the response
       const brandName = externalApiResponse.data.product?.brand || "Unknown";
       console.log("Extracted brand name:", brandName);
 
-      // Fetch boycott status from the backend
-      console.log("Sending request to backend for boycott status...");
+      console.log("Sending request to backend with brand:", brandName);
       const backendApiResponse = await axios.post(
-        "BACKEND_URL",
+        "http://192.168.1.7:8000/purepick/check_boycott/",
         { brand: brandName },
         { headers: { "Content-Type": "application/json" } }
       );
+
+      console.log("Backend API response:", backendApiResponse.data); // Debugging backend response
 
       const { status, message, country_of_manufacture } =
         backendApiResponse.data;
@@ -113,7 +114,7 @@ const BoycottCheckScreen = ({ navigation }) => {
         "An unexpected error occurred. Please try again later.";
 
       if (error.response) {
-        console.log("Backend responded with error:", error.response.data);
+        console.log("Backend error response:", error.response.data);
         console.log("Status code:", error.response.status);
 
         if (error.response.status === 404) {
@@ -124,11 +125,11 @@ const BoycottCheckScreen = ({ navigation }) => {
             "There was a conflict with the request. Please try again.";
         }
       } else if (error.request) {
-        console.log("No response received from the backend:", error.request);
+        console.log("No response received from backend:", error.request);
         userFriendlyMessage =
           "Could not connect to the server. Check your internet connection.";
       } else {
-        console.log("Error during setup of the request:", error.message);
+        console.log("Request setup error:", error.message);
       }
 
       navigation.navigate("NoInfo", { message: userFriendlyMessage });
@@ -140,16 +141,13 @@ const BoycottCheckScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
-        {/* Background Image - boycott */}
         <Image
           source={require("../assets/images/background-boycott.png")}
           style={styles.backgroundImageboycott}
         />
 
-        {/* Header Section */}
         <Header navigation={navigation} title="Boycott Check Screen" />
 
-        {/* Camera View for Barcode Scanning */}
         <View style={styles.barcodeContainer}>
           <CameraView
             style={styles.camera}
@@ -158,10 +156,8 @@ const BoycottCheckScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Loading Indicator */}
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
-        {/* Display Extracted Data */}
         {extractedData && (
           <View style={styles.productInfo}>
             <Text style={styles.title}>Extracted Data:</Text>
@@ -169,10 +165,10 @@ const BoycottCheckScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Button to Rescan */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
+            console.log("Resetting scan state...");
             setScanned(false);
             setExtractedData(null);
           }}
@@ -182,9 +178,7 @@ const BoycottCheckScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        {/* Square Containers */}
         <View style={styles.squareContainers}>
-          {/* Left Square Container */}
           <TouchableOpacity
             style={[styles.squareContainer, styles.leftContainer]}
             onPress={() => navigation.navigate("AllergenCheck")}
@@ -196,7 +190,6 @@ const BoycottCheckScreen = ({ navigation }) => {
             <Text style={styles.leftText}>Allergen</Text>
           </TouchableOpacity>
 
-          {/* Right Square Container */}
           <TouchableOpacity
             style={[styles.squareContainer, styles.rightContainer]}
             onPress={() => navigation.navigate("BoycottCheck")}
@@ -209,7 +202,6 @@ const BoycottCheckScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Footer Section */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.iconContainer}
