@@ -99,6 +99,7 @@ const BoycottCheckScreen = ({ navigation }) => {
           brand: brandName,
           reason: message,
           countryOfManufacture: country_of_manufacture,
+          category: externalApiResponse.data.product?.category || "Unknown",
         });
       } else if (status === "not_boycotted") {
         console.log("Product is safe.");

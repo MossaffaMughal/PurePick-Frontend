@@ -1,7 +1,10 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
-const BoycottProductScreen = ({ navigation }) => {
+const BoycottProductScreen = ({ navigation, route }) => {
+  // Extract category from route params
+  const { category } = route.params || {};
+
   return (
     <View style={styles.container}>
       {/* Header with Back and Home Buttons */}
@@ -55,7 +58,12 @@ const BoycottProductScreen = ({ navigation }) => {
       {/* Search Alternatives Product Button */}
       <TouchableOpacity
         style={styles.button_alternatives}
-        onPress={() => navigation.navigate("Alternatives")}
+        onPress={() =>
+          navigation.navigate("Alternatives", {
+            category,
+            triggeredByButton: true,
+          })
+        }
       >
         <Text style={styles.buttonText}>Search Alternatives</Text>
       </TouchableOpacity>

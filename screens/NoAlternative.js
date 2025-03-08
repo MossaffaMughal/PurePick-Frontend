@@ -17,11 +17,7 @@ const NoAlternative = ({ navigation }) => {
         <View style={styles.left}>
           <TouchableOpacity
             onPress={() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack(); // Go back if possible
-              } else {
-                navigation.navigate("HomeScreen"); // Fallback to HomeScreen
-              }
+              navigation.navigate("BoycottCheck");
             }}
           >
             <Image
@@ -44,7 +40,7 @@ const NoAlternative = ({ navigation }) => {
           style={[styles.searchIcon, { tintColor: "#cf3e3e" }]} // Custom red color
         />
         <TextInput
-          placeholder="Search by category e.g. biscuits"
+          placeholder="Search product by company"
           placeholderTextColor="#9E9E9E"
           style={styles.searchInput}
         />
@@ -58,7 +54,7 @@ const NoAlternative = ({ navigation }) => {
       />
 
       {/* Text */}
-      <Text style={styles.noProductText}>No Product Found!</Text>
+      <Text style={styles.noProductText}>No Alternative Found!</Text>
     </View>
   );
 };
