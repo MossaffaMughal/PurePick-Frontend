@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,242 +6,242 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import Header from "../components/Header";
 
+const APILAYER_API_KEY = "GNxoWDh5kynYALlnPiHcu1RmYTBxQSDA"; // Replace with your valid API Key
+const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload"; // ImageKit upload endpoint
+const IMAGEKIT_PUBLIC_KEY = "public_EaKR7nhsODNsHxMrSIiVZ3gC5Ek="; // Replace with your ImageKit public key
+
 const AllergenCheckScreen = ({ navigation }) => {
+  const [photoUri, setPhotoUri] = useState(null);
+  const [extractedText, setExtractedText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // 📸 Capture Image
+  const captureImage = async () => {
+    let permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Camera access is needed.");
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      base64: true, // Ensure base64 conversion
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      handleImageResponse(result.assets[0]);
+    }
+  };
+
+  // 🖼 Select Image from Gallery
+  const pickImage = async () => {
+    let permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Gallery access is needed.");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      base64: true, // Ensure base64 conversion
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      handleImageResponse(result.assets[0]);
+    }
+  };
+
+  // 📍 Handle Image Selection & Perform OCR
+  const handleImageResponse = async (image) => {
+    setPhotoUri(image.uri);
+    setLoading(true);
+    console.log("Selected Image URI:", image.uri);
+
+    try {
+      // Upload the file using its URI
+      const imageUrl = await uploadToImageKit(image.uri);
+      await performOCR(imageUrl);
+    } catch (error) {
+      console.error("❌ Error processing image:", error);
+      Alert.alert("Error", "Failed to process the image. Please try again.");
+    }
+
+    setLoading(false);
+  };
+
+  const uploadToImageKit = async (fileUri) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: fileUri,
+        name: "uploaded_image.jpg",
+        type: "image/jpeg", // Ensure this matches the file type
+      });
+      formData.append("fileName", "uploaded_image.jpg");
+
+      const privateKey = "private_KuyoCG6QIwKTEQX/HGrKa1/6GIE=";
+      const encodedAuth = btoa(`${privateKey}:`);
+
+      const response = await fetch(IMAGEKIT_UPLOAD_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${encodedAuth}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log("ImageKit Response:", data);
+
+      if (!data || !data.url) {
+        throw new Error("Failed to get image URL from ImageKit.");
+      }
+
+      return data.url; // Return the public URL
+    } catch (error) {
+      console.error("❌ Error uploading to ImageKit:", error);
+      throw error;
+    }
+  };
+
+  // 🔹 Perform OCR using APILayer API
+  const performOCR = async (imageUrl) => {
+    try {
+      console.log("Performing OCR...");
+
+      const response = await fetch(
+        `https://api.apilayer.com/image_to_text/url?url=${imageUrl}`,
+        {
+          method: "GET",
+          headers: {
+            apikey: APILAYER_API_KEY,
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("OCR API Response:", data);
+
+      if (data && data["all_text"]) {
+        setExtractedText(data["all_text"]);
+      } else {
+        setExtractedText("No text detected");
+      }
+    } catch (error) {
+      console.error("❌ Error performing OCR:", error);
+      setExtractedText("Error extracting text.");
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Background Image */}
-      <Image
-        source={require("../assets/images/background-allergen.png")}
-        style={styles.backgroundImage}
-      />
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.container}>
+        <Image
+          source={require("../assets/images/background-allergen.png")}
+          style={styles.backgroundImage}
+        />
+        <Header navigation={navigation} title="Allergen Check Screen" />
 
-      {/* Header Section */}
-      <Header navigation={navigation} title="Allergen Check Screen" />
-
-      {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* Barcode Section */}
+        {/* Image Display Section */}
         <View style={styles.barcodeContainer}>
-          <View style={styles.lineContainer} />
-          <Image
-            source={require("../assets/images/ingredients.png")}
-            style={styles.allergenImg}
-          />
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.allergenImg} />
+          ) : (
+            <Image
+              source={require("../assets/images/ingredients.png")}
+              style={styles.allergenImg}
+            />
+          )}
         </View>
 
-        {/* Buttons */}
+        {loading && <ActivityIndicator size="large" color="#0000ff" />}
+
+        {/* Buttons for Capturing or Picking Image */}
         <TouchableOpacity
-          style={styles.buttonSec}
-          onPress={() => navigation.navigate("AllergenDisplay")}
+          style={styles.button}
+          onPress={captureImage}
+          disabled={loading}
         >
-          <Text style={styles.buttonText}>Allergen Display</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonSec}
-          onPress={() => navigation.navigate("NoAllergenFound")}
-        >
-          <Text style={styles.buttonText}>No Allergen Found</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Upload Ingredients Image</Text>
+          <Text style={styles.buttonText}>Take Photo</Text>
         </TouchableOpacity>
 
-        {/* Square Containers */}
-        <View style={styles.squareContainers}>
-          {/* Left Square Container */}
-          <TouchableOpacity
-            style={[styles.squareContainer, styles.leftContainer]}
-            onPress={() => navigation.navigate("AllergenCheck")}
-          >
-            <Image
-              source={require("../assets/images/health_icon.png")}
-              style={styles.optionIcon}
-            />
-            <Text style={styles.leftText}>Allergen</Text>
-          </TouchableOpacity>
-
-          {/* Right Square Container */}
-          <TouchableOpacity
-            style={[styles.squareContainer, styles.rightContainer]}
-            onPress={() => navigation.navigate("BoycottCheck")}
-          >
-            <Image
-              source={require("../assets/images/boycott_icon.png")}
-              style={styles.optionIcon}
-            />
-            <Text style={styles.rightText}>Boycott</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      {/* Footer Section */}
-      <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.iconContainer}
-          onPress={() => navigation.navigate("Home")}
+          style={styles.button}
+          onPress={pickImage}
+          disabled={loading}
         >
-          <Image
-            source={require("../assets/images/home_icon.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.iconText}>Home</Text>
+          <Text style={styles.buttonText}>Pick from Gallery</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconContainer}
-          onPress={() => navigation.navigate("About")}
-        >
-          <Image
-            source={require("../assets/images/about_icon.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.iconText}>About</Text>
-        </TouchableOpacity>
+
+        {/* Extracted Text Display */}
+        {extractedText !== "" && (
+          <View style={styles.extractedTextContainer}>
+            <Text style={styles.title}>Extracted Text:</Text>
+            <Text style={styles.extractedText}>{extractedText}</Text>
+          </View>
+        )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "transparent",
-  },
+  scrollContent: { flexGrow: 1 },
+  container: { flex: 1, alignItems: "center", backgroundColor: "transparent" },
   backgroundImage: {
     position: "absolute",
-    top: 0,
+    top: 20,
     left: 0,
-    width: "100%",
-    height: "100%",
+    width: 450,
+    height: 750,
     opacity: 0.9,
     zIndex: -1,
   },
-  scrollViewContent: {
-    paddingHorizontal: 20,
-    paddingTop: 150, // Add padding to avoid overlap with header
-    paddingBottom: 120, // Ensure content doesn't overlap with footer
-    alignItems: "center",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    height: 80,
-    backgroundColor: "#086308",
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
-  },
-  icon: {
-    width: 25,
-    height: 25,
-    marginBottom: 5,
-    tintColor: "white",
-  },
-  iconContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  iconText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
   button: {
-    padding: 15,
+    padding: 10,
     backgroundColor: "#086308",
-    borderColor: "white",
-    borderWidth: 4,
     borderRadius: 20,
-    marginVertical: 20,
-    alignItems: "center",
     width: 300,
-    height: 65,
-    elevation: 5,
-  },
-  buttonSec: {
-    padding: 15,
-    backgroundColor: "#086308",
-    borderColor: "white",
-    borderWidth: 4,
-    borderRadius: 20,
-    marginVertical: 10,
+    height: 60,
     alignItems: "center",
-    width: 300,
-    height: 65,
-    elevation: 5,
+    justifyContent: "center",
+    marginTop: 20,
   },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
+  buttonText: { color: "white", fontWeight: "bold", fontSize: 20 },
   barcodeContainer: {
     width: 300,
     height: 210,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f0f0f0",
-    borderColor: "#086308",
-    borderWidth: 4,
     borderRadius: 20,
+    marginTop: 180,
+  },
+  allergenImg: { width: 260, height: 170, borderRadius: 10 },
+  extractedTextContainer: {
     marginTop: 20,
-  },
-  allergenImg: {
-    width: 260,
-    height: 170,
+    padding: 10,
+    backgroundColor: "#ffffff",
     borderRadius: 10,
-  },
-  lineContainer: {
-    position: "absolute",
-    top: "50%",
-    left: 0,
-    width: "100%",
-    height: 3,
-    backgroundColor: "#086308",
-    zIndex: 1,
-  },
-  squareContainers: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 20,
-  },
-  squareContainer: {
-    width: 140,
-    height: 140,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    borderWidth: 4,
-  },
-  rightContainer: {
-    backgroundColor: "#086308",
-    borderColor: "white",
-    marginLeft: 10,
-  },
-  rightText: {
-    color: "white",
-    fontWeight: "bold",
-    marginTop: 10,
-    fontSize: 16,
-  },
-  leftContainer: {
-    backgroundColor: "white",
+    borderWidth: 1,
     borderColor: "#086308",
-    marginRight: 10,
+    width: "90%",
   },
-  leftText: {
-    color: "#086308",
+  title: {
     fontWeight: "bold",
-    marginTop: 10,
-    fontSize: 16,
+    fontSize: 18,
+    marginBottom: 10,
+    color: "#086308",
   },
-  optionIcon: {
-    width: 60,
-    height: 60,
-  },
+  extractedText: { fontSize: 16, color: "#333" },
 });
 
 export default AllergenCheckScreen;
