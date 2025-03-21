@@ -2,7 +2,18 @@ import React from "react";
 import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 import Header from "../components/Header";
 
-const AllergensDisplayScreen = ({ navigation }) => {
+const AllergensDisplayScreen = ({ route, navigation }) => {
+  // Extract data from navigation props
+  const { allergensData, imageUri } = route.params || {};
+
+  // Extract allergens and allergy names safely
+  const allergens = allergensData?.Allergens
+    ? allergensData.Allergens.split(", ")
+    : [];
+  const allergyNames = allergensData?.["Allergy name"]
+    ? allergensData["Allergy name"].split(", ")
+    : [];
+
   return (
     <View style={styles.container}>
       {/* Header Component */}
@@ -12,7 +23,7 @@ const AllergensDisplayScreen = ({ navigation }) => {
       <View style={styles.card}>
         {/* Allergen Image */}
         <Image
-          source={require("../assets/images/ingredients.png")} // Dummy path
+          source={require("../assets/images/ingredients.png")}
           style={styles.backgroundImage}
         />
 
@@ -20,37 +31,41 @@ const AllergensDisplayScreen = ({ navigation }) => {
         <View style={styles.contentContainer}>
           <View style={styles.warningContainer}>
             <Image
-              source={require("../assets/images/warning-icon.png")} // Dummy path for small icon
+              source={require("../assets/images/warning-icon.png")}
               style={styles.warningIcon}
             />
             <Text style={styles.warningText}>PRODUCT MAY CAUSE</Text>
           </View>
+
+          {/* Display Allergy Names */}
           <View style={styles.allergyBox}>
             <Text style={styles.allergyText}>
-              Peanut Allergy, Lactose Intolerance, Egg Allergy
+              {allergyNames.length > 0
+                ? allergyNames.join(", ")
+                : "No Allergies Detected"}
             </Text>
           </View>
 
           <Text style={styles.ingredientsHeading}>
             INGREDIENTS CAUSING ALLERGIES:
           </Text>
+
+          {/* Display Allergen Ingredients as Tags */}
           <View style={styles.ingredientTagsContainer}>
-            {["Peanuts", "Milk", "Butter", "Cheese", "Eggs", "Albumin"].map(
-              (ingredient, index) => (
+            {allergens.length > 0 ? (
+              allergens.map((ingredient, index) => (
                 <Text
                   key={index}
-                  style={[
-                    styles.ingredientTag,
-                    styles[`ingredient${ingredient}`], // Dynamically apply colors
-                  ]}
+                  style={[styles.ingredientTag, getIngredientColor(index)]}
                 >
                   {ingredient}
                 </Text>
-              )
+              ))
+            ) : (
+              <Text style={styles.noAllergensText}>No allergens detected</Text>
             )}
           </View>
         </View>
-
         {/* Button */}
         <TouchableOpacity
           style={styles.button}
@@ -63,6 +78,20 @@ const AllergensDisplayScreen = ({ navigation }) => {
   );
 };
 
+// Function to generate dynamic colors for allergens
+const getIngredientColor = (index) => {
+  const colors = [
+    "#a7c4ae",
+    "#779a7f",
+    "#e7b2a0",
+    "#bba9cd",
+    "#8dc0c0",
+    "#cebddf",
+    "#acb9c8",
+  ];
+  return { backgroundColor: colors[index % colors.length], color: "white" };
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -70,14 +99,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   card: {
-    backgroundColor: "#086308", // Dark green background for the card
+    backgroundColor: "#086308",
     borderRadius: 18,
     marginTop: 150,
     padding: 20,
     width: "90%",
     alignItems: "center",
-    elevation: 5, // Shadow for Android
-    shadowColor: "#000", // Shadow for iOS
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -85,17 +114,17 @@ const styles = StyleSheet.create({
   backgroundImage: {
     width: "100%",
     height: 150,
-    // marginBottom: 20,
     resizeMode: "cover",
     borderRadius: 13,
     borderBottomRightRadius: 0,
     borderBottomLeftRadius: 0,
   },
   contentContainer: {
-    backgroundColor: "#ffffff", // White background for content
+    backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 15,
     width: "100%",
+    height: 320,
     marginBottom: 20,
     marginTop: -10,
     paddingBottom: 20,
@@ -119,16 +148,16 @@ const styles = StyleSheet.create({
   },
   allergyBox: {
     borderWidth: 2,
-    borderColor: "#086308", // Dark green border
+    borderColor: "#086308",
     borderRadius: 10,
-    backgroundColor: "#ffffff", // White background
+    backgroundColor: "#ffffff",
     padding: 10,
-    marginBottom: 15, // Spacing below the box
-    width: "100%", // Full width of the container
+    marginBottom: 15,
+    width: "100%",
   },
   allergyText: {
     fontSize: 14,
-    color: "#086308", // Dark green text
+    color: "#086308",
     textAlign: "center",
     fontWeight: "bold",
   },
@@ -136,7 +165,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     fontWeight: "bold",
-    color: "#086308", // Dark text for ingredients heading
+    color: "#086308",
     textAlign: "center",
   },
   ingredientTagsContainer: {
@@ -155,13 +184,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
   },
-  // Custom background colors for allergens
-  ingredientPeanuts: { backgroundColor: "#779a7f", color: "white" }, // Light green
-  ingredientMilk: { backgroundColor: "#e7b2a0", color: "white" }, // Light peach
-  ingredientButter: { backgroundColor: "#bba9cd", color: "white" }, // Light purple
-  ingredientCheese: { backgroundColor: "#8dc0c0", color: "white" }, // Light turquoise (ferozi)
-  ingredientEggs: { backgroundColor: "#cebddf", color: "white" }, // Soft peach
-  ingredientAlbumin: { backgroundColor: "#acb9c8", color: "white" }, // Pale turquoise
+  noAllergensText: {
+    fontSize: 14,
+    color: "#777",
+    textAlign: "center",
+  },
   button: {
     padding: 10,
     backgroundColor: "white",
@@ -173,12 +200,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 270,
     height: 60,
-    // Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    // Elevation for Android
     elevation: 5,
     zIndex: 1,
   },

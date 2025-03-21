@@ -15,6 +15,7 @@ import Header from "../components/Header";
 const APILAYER_API_KEY = "GNxoWDh5kynYALlnPiHcu1RmYTBxQSDA"; // Replace with your valid API Key
 const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload"; // ImageKit upload endpoint
 const IMAGEKIT_PUBLIC_KEY = "public_EaKR7nhsODNsHxMrSIiVZ3gC5Ek="; // Replace with your ImageKit public key
+const BACKEND_URL = "http://192.168.1.7:8000/purepick/check_allergen/";
 
 const AllergenCheckScreen = ({ navigation }) => {
   const [photoUri, setPhotoUri] = useState(null);
@@ -63,6 +64,7 @@ const AllergenCheckScreen = ({ navigation }) => {
   const handleImageResponse = async (image) => {
     setPhotoUri(image.uri);
     setLoading(true);
+    setShowOverlay(true);
     console.log("Selected Image URI:", image.uri);
 
     try {
@@ -95,6 +97,7 @@ const AllergenCheckScreen = ({ navigation }) => {
         headers: {
           Authorization: `Basic ${encodedAuth}`,
         },
+
         body: formData,
       });
 
@@ -132,8 +135,10 @@ const AllergenCheckScreen = ({ navigation }) => {
 
       if (data && data["all_text"]) {
         setExtractedText(data["all_text"]);
+        await detectAllergens(data["all_text"]);
       } else {
         setExtractedText("No text detected");
+        Alert.alert("Error", "Could not extract text from image.");
       }
     } catch (error) {
       console.error("❌ Error performing OCR:", error);
@@ -141,6 +146,39 @@ const AllergenCheckScreen = ({ navigation }) => {
     }
   };
 
+  // 🔹 Send extracted text to backend for allergen detection
+  const detectAllergens = async (ingredientsText) => {
+    try {
+      console.log("Sending to backend for allergen detection...");
+
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: ingredientsText }),
+      });
+
+      const result = await response.json();
+      console.log("Backend Response:", result);
+
+      if (result.error) {
+        Alert.alert("Error", "Failed to detect allergens.");
+        return;
+      }
+
+      // ✅ Check if allergens exist, then navigate accordingly
+      if (result.response.Allergens) {
+        navigation.navigate("AllergenDisplay", {
+          allergensData: result.response,
+          imageUri: photoUri,
+        });
+      } else {
+        navigation.navigate("NoAllergenFound");
+      }
+    } catch (error) {
+      console.error("❌ Error detecting allergens:", error);
+      Alert.alert("Error", "Failed to connect to backend.");
+    }
+  };
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
@@ -149,7 +187,6 @@ const AllergenCheckScreen = ({ navigation }) => {
           style={styles.backgroundImage}
         />
         <Header navigation={navigation} title="Allergen Check Screen" />
-
         {/* Image Display Section */}
         <View style={styles.barcodeContainer}>
           {photoUri ? (
@@ -161,33 +198,56 @@ const AllergenCheckScreen = ({ navigation }) => {
             />
           )}
         </View>
-
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
-
-        {/* Buttons for Capturing or Picking Image */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={captureImage}
-          disabled={loading}
-        >
+        {/* Capture Image Button */}
+        <TouchableOpacity style={styles.button} onPress={captureImage}>
           <Text style={styles.buttonText}>Take Photo</Text>
         </TouchableOpacity>
+        <View style={styles.squareContainers}>
+          <TouchableOpacity
+            style={[styles.squareContainer, styles.leftContainer]}
+            onPress={() => navigation.navigate("AllergenCheck")}
+          >
+            <Image
+              source={require("../assets/images/health_icon.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.leftText}>Allergen</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={pickImage}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Pick from Gallery</Text>
-        </TouchableOpacity>
-
-        {/* Extracted Text Display */}
-        {extractedText !== "" && (
-          <View style={styles.extractedTextContainer}>
-            <Text style={styles.title}>Extracted Text:</Text>
-            <Text style={styles.extractedText}>{extractedText}</Text>
-          </View>
-        )}
+          <TouchableOpacity
+            style={[styles.squareContainer, styles.rightContainer]}
+            onPress={() => navigation.navigate("BoycottCheck")}
+          >
+            <Image
+              source={require("../assets/images/boycott_icon.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.rightText}>Boycott</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Image
+              source={require("../assets/images/home_icon.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.iconText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => navigation.navigate("About")}
+          >
+            <Image
+              source={require("../assets/images/about_icon.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.iconText}>About</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -205,6 +265,27 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     zIndex: -1,
   },
+  barcodeContainer: {
+    width: 300,
+    height: 210,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f0f0f0",
+    borderColor: "#086308",
+    borderWidth: 4,
+    borderRadius: 20,
+    marginTop: 180,
+  },
+  scanText: {
+    color: "#086308",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  allergenImg: {
+    width: 260,
+    height: 170,
+    borderRadius: 10,
+  },
   button: {
     padding: 10,
     backgroundColor: "#086308",
@@ -216,32 +297,77 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: { color: "white", fontWeight: "bold", fontSize: 20 },
-  barcodeContainer: {
-    width: 300,
-    height: 210,
-    alignItems: "center",
+  squareContainers: {
+    flexDirection: "row",
     justifyContent: "center",
-    backgroundColor: "#f0f0f0",
+    marginBottom: 120,
+    alignContent: "center",
+  },
+  squareContainers: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 120,
+    alignContent: "center",
+  },
+  squareContainer: {
+    marginTop: 70,
+    width: 145,
+    height: 145,
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 20,
-    marginTop: 180,
+    borderWidth: 4,
   },
-  allergenImg: { width: 260, height: 170, borderRadius: 10 },
-  extractedTextContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#086308",
-    width: "90%",
+  leftContainer: {
+    marginRight: 10,
+    backgroundColor: "#086308",
+    borderColor: "white",
   },
-  title: {
+  leftText: {
+    color: "white",
     fontWeight: "bold",
-    fontSize: 18,
-    marginBottom: 10,
-    color: "#086308",
+    marginTop: 10,
+    fontSize: 20,
   },
-  extractedText: { fontSize: 16, color: "#333" },
+  rightContainer: {
+    backgroundColor: "white",
+    borderColor: "#086308",
+  },
+  rightText: {
+    color: "#086308",
+    fontWeight: "bold",
+    marginTop: 10,
+    fontSize: 20,
+  },
+  optionIcon: {
+    width: 70,
+    height: 70,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 100,
+    backgroundColor: "#086308", // Customize footer color as needed
+    width: "100%",
+    position: "absolute", // Fix the footer to the bottom
+    bottom: 0, // Set the footer to the bottom of the screen
+  },
+  icon: {
+    width: 25,
+    height: 25,
+    marginBottom: 10,
+    tintColor: "white",
+  },
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
 });
 
 export default AllergenCheckScreen;
