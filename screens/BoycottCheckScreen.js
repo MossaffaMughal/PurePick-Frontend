@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Button,
 } from "react-native";
+import { timedApiCall } from "../utils/apiTimer";
 import { useState, useEffect } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import axios from "axios";
@@ -63,8 +64,11 @@ const BoycottCheckScreen = ({ navigation }) => {
         },
       };
 
-      const externalApiResponse = await axios.request(externalApiOptions);
-      console.log("External API response:", externalApiResponse.data); // Debugging response
+      // const externalApiResponse = await axios.request(externalApiOptions);
+      const externalApiResponse = await timedApiCall("Barcode Lookup API", () =>
+        axios.request(externalApiOptions)
+      );
+      console.log("Barcode API response:", externalApiResponse.data); // Debugging response
 
       if (
         !externalApiResponse.data ||
@@ -83,10 +87,18 @@ const BoycottCheckScreen = ({ navigation }) => {
       console.log("Extracted brand name:", brandName);
 
       console.log("Sending request to backend with brand:", brandName);
-      const backendApiResponse = await axios.post(
-        "http://192.168.168.20:8000/purepick/check_boycott/",
-        { brand: brandName },
-        { headers: { "Content-Type": "application/json" } }
+      // const backendApiResponse = await axios.post(
+      //   "http://192.168.4.20:8000/purepick/check_boycott/",
+      //   { brand: brandName },
+      //   { headers: { "Content-Type": "application/json" } }
+      // );
+
+      const backendApiResponse = await timedApiCall("Boycott Check API", () =>
+        axios.post(
+          "http://192.168.4.20:8000/purepick/check_boycott/",
+          { brand: brandName },
+          { headers: { "Content-Type": "application/json" } }
+        )
       );
 
       console.log("Backend API response:", backendApiResponse.data); // Debugging backend response

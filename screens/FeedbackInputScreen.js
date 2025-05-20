@@ -9,24 +9,40 @@ import {
   ScrollView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import Header from "../components/Header"; // Assuming you have a reusable Header component
+import Header from "../components/Header";
+import { timedApiCall } from "../utils/apiTimer";
 
 const FeedbackInputScreen = ({ navigation }) => {
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState("");
 
-  const handleSubmit = () => {
-    // Check if either rating or comments are empty
-    if (rating === 0 || comments.trim() === "") {
-      // If invalid, navigate to the FeedbackFailedScreen
-      navigation.navigate("FeedbackFailed");
-    } else {
-      // If valid, navigate to the FeedbackSubmittedScreen
-      navigation.navigate("FeedbackSubmitted");
-    }
-    setRating(0); // Reset rating to 0
-    setComments(""); // Reset comments to empty string
+  // const handleSubmit = () => {
+  //   // Check if either rating or comments are empty
+  //   if (rating === 0 || comments.trim() === "") {
+  //     // If invalid, navigate to the FeedbackFailedScreen
+  //     navigation.navigate("FeedbackFailed");
+  //   } else {
+  //     // If valid, navigate to the FeedbackSubmittedScreen
+  //     navigation.navigate("FeedbackSubmitted");
+  //   }
+  //   setRating(0); // Reset rating to 0
+  //   setComments(""); // Reset comments to empty string
+  // };
+
+  const handleSubmit = async () => {
+    await timedApiCall("Feedback Submission", async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (rating === 0 || comments.trim() === "") {
+        navigation.navigate("FeedbackFailed");
+      } else {
+        navigation.navigate("FeedbackSubmitted");
+      }
+    });
+
+    setRating(0);
+    setComments("");
   };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>

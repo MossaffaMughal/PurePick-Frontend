@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import Header from "../components/Header";
+import { timedApiCall } from "../utils/apiTimer";
 
 const AlternativesScreen = ({ navigation, route }) => {
   const { category } = route.params || {};
@@ -29,10 +30,18 @@ const AlternativesScreen = ({ navigation, route }) => {
     try {
       setIsLoading(true);
       setNoResults(false);
-      const response = await axios.post(
-        "http://192.168.168.20:8000/purepick/get_alternatives/",
-        { category: category },
-        { headers: { "Content-Type": "application/json" } }
+      // const response = await axios.post(
+      //   "http://192.168.4.20:8000/purepick/get_alternatives/",
+      //   { category: category },
+      //   { headers: { "Content-Type": "application/json" } }
+      // );
+
+      const response = await timedApiCall("Get Alternatives API", () =>
+        axios.post(
+          "http://192.168.4.20:8000/purepick/get_alternatives/",
+          { category: category },
+          { headers: { "Content-Type": "application/json" } }
+        )
       );
 
       const { alternatives } = response.data;

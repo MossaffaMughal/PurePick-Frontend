@@ -11,12 +11,13 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Header from "../components/Header";
+import { timedApiCall } from "../utils/apiTimer";
 
 // const APILAYER_API_KEY = "GNxoWDh5kynYALlnPiHcu1RmYTBxQSDA"; // APILAYER API Key
 const APILAYER_API_KEY = "tGq8UhBVwUfIzhkjg7pV1uSd9b8IcF0E"; // API Key
 const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload"; // ImageKit upload endpoint
 const IMAGEKIT_PUBLIC_KEY = "public_EaKR7nhsODNsHxMrSIiVZ3gC5Ek="; // ImageKit public key
-const BACKEND_URL = "http://192.168.168.20:8000/purepick/check_allergen/";
+const BACKEND_URL = "http://192.168.4.20:8000/purepick/check_allergen/";
 
 const AllergenCheckScreen = ({ navigation }) => {
   const [photoUri, setPhotoUri] = useState(null);
@@ -127,14 +128,23 @@ const AllergenCheckScreen = ({ navigation }) => {
     try {
       console.log("Performing OCR...");
 
-      const response = await fetch(
-        `https://api.apilayer.com/image_to_text/url?url=${imageUrl}`,
-        {
+      // const response = await fetch(
+      //   `https://api.apilayer.com/image_to_text/url?url=${imageUrl}`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       apikey: APILAYER_API_KEY,
+      //     },
+      //   }
+      // );
+
+      const response = await timedApiCall("APILayer OCR API", () =>
+        fetch(`https://api.apilayer.com/image_to_text/url?url=${imageUrl}`, {
           method: "GET",
           headers: {
             apikey: APILAYER_API_KEY,
           },
-        }
+        })
       );
 
       const data = await response.json();
@@ -158,11 +168,19 @@ const AllergenCheckScreen = ({ navigation }) => {
     try {
       console.log("Sending to backend for allergen detection...");
 
-      const response = await fetch(BACKEND_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: ingredientsText }),
-      });
+      // const response = await fetch(BACKEND_URL, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ query: ingredientsText }),
+      // });
+
+      const response = await timedApiCall("Allergen Check", () =>
+        fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: ingredientsText }),
+        })
+      );
 
       const result = await response.json();
       console.log("Backend Response:", result);
