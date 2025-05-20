@@ -30,7 +30,7 @@ const AlternativesScreen = ({ navigation, route }) => {
       setIsLoading(true);
       setNoResults(false);
       const response = await axios.post(
-        "http://192.168.1.7:8000/purepick/get_alternatives/",
+        "http://192.168.168.20:8000/purepick/get_alternatives/",
         { category: category },
         { headers: { "Content-Type": "application/json" } }
       );

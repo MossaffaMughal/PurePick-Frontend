@@ -12,10 +12,11 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import Header from "../components/Header";
 
-const APILAYER_API_KEY = "GNxoWDh5kynYALlnPiHcu1RmYTBxQSDA"; // Replace with your valid API Key
+// const APILAYER_API_KEY = "GNxoWDh5kynYALlnPiHcu1RmYTBxQSDA"; // APILAYER API Key
+const APILAYER_API_KEY = "tGq8UhBVwUfIzhkjg7pV1uSd9b8IcF0E"; // API Key
 const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload"; // ImageKit upload endpoint
-const IMAGEKIT_PUBLIC_KEY = "public_EaKR7nhsODNsHxMrSIiVZ3gC5Ek="; // Replace with your ImageKit public key
-const BACKEND_URL = "http://192.168.1.7:8000/purepick/check_allergen/";
+const IMAGEKIT_PUBLIC_KEY = "public_EaKR7nhsODNsHxMrSIiVZ3gC5Ek="; // ImageKit public key
+const BACKEND_URL = "http://192.168.168.20:8000/purepick/check_allergen/";
 
 const AllergenCheckScreen = ({ navigation }) => {
   const [photoUri, setPhotoUri] = useState(null);
@@ -37,6 +38,7 @@ const AllergenCheckScreen = ({ navigation }) => {
     });
 
     if (!result.canceled) {
+      console.log("Image selected:", result.assets[0].uri);
       handleImageResponse(result.assets[0]);
     }
   };
@@ -62,9 +64,11 @@ const AllergenCheckScreen = ({ navigation }) => {
 
   // 📍 Handle Image Selection & Perform OCR
   const handleImageResponse = async (image) => {
+    console.log("Handle Image response function");
     setPhotoUri(image.uri);
+    console.log("Selected photo uri");
     setLoading(true);
-    setShowOverlay(true);
+    // setShowOverlay(true);
     console.log("Selected Image URI:", image.uri);
 
     try {
@@ -82,6 +86,7 @@ const AllergenCheckScreen = ({ navigation }) => {
   const uploadToImageKit = async (fileUri) => {
     try {
       const formData = new FormData();
+      formData.append("publicKey", IMAGEKIT_PUBLIC_KEY);
       formData.append("file", {
         uri: fileUri,
         name: "uploaded_image.jpg",
@@ -92,6 +97,7 @@ const AllergenCheckScreen = ({ navigation }) => {
       const privateKey = "private_KuyoCG6QIwKTEQX/HGrKa1/6GIE=";
       const encodedAuth = btoa(`${privateKey}:`);
 
+      console.log("Uploading to ImageKit...");
       const response = await fetch(IMAGEKIT_UPLOAD_URL, {
         method: "POST",
         headers: {
@@ -100,6 +106,7 @@ const AllergenCheckScreen = ({ navigation }) => {
 
         body: formData,
       });
+      console.log("Upload response received");
 
       const data = await response.json();
       console.log("ImageKit Response:", data);

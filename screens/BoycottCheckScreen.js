@@ -57,6 +57,7 @@ const BoycottCheckScreen = ({ navigation }) => {
         url: `https://product-lookup-by-upc-or-ean.p.rapidapi.com/code/${data}`,
         headers: {
           "x-rapidapi-key":
+            // "f887c2d552msh6f354d4fb3c716ep1b5ddbjsnb9c6e58713ea",
             "f887c2d552msh6f354d4fb3c716ep1b5ddbjsnb9c6e58713ea",
           "x-rapidapi-host": "product-lookup-by-upc-or-ean.p.rapidapi.com",
         },
@@ -83,7 +84,7 @@ const BoycottCheckScreen = ({ navigation }) => {
 
       console.log("Sending request to backend with brand:", brandName);
       const backendApiResponse = await axios.post(
-        "http://192.168.1.7:8000/purepick/check_boycott/",
+        "http://192.168.168.20:8000/purepick/check_boycott/",
         { brand: brandName },
         { headers: { "Content-Type": "application/json" } }
       );
